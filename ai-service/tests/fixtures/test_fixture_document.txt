@@ -1,0 +1,13 @@
+# AgriSaarthi Test Fixture Document
+
+This is a verified test document for pipeline execution testing. It does not contain real agricultural data to prevent hallucination in the RAG pipeline.
+
+## Soil Section
+The ideal soil test type for the test-crop is test-soil. It requires a pH of exactly 7.99 for optimal testing growth.
+
+## Pest Section
+The major pest for the test-crop is the test-bug. It appears during the testing phase of the crop lifecycle.
+Do not use real chemicals. Use 500ml of Test-Chemical per hectare.
+
+## Guidelines
+This document is strictly for testing the ingestion pipeline, metadata preservation, and chunking boundaries.

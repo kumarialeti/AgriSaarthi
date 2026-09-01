@@ -1,0 +1,3 @@
+Nutrient Management for Rice
+
+Apply NPK based on soil test results. General recommendation is 100-120 kg N, 40-60 kg P2O5, and 40 kg K2O per hectare. Nitrogen should be applied in 3 splits (basal, active tillering, and panicle initiation). Zinc deficiency (Khaira disease) is common in flooded rice; apply Zinc Sulphate at 25 kg/ha if soil is deficient. Use Leaf Color Chart (LCC) for real-time nitrogen management.

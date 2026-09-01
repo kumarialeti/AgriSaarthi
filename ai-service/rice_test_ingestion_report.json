@@ -1,0 +1,48 @@
+[
+  {
+    "document_id": "eed39dd48c9b",
+    "filename": "aerobic_rice.txt",
+    "status": "success",
+    "failure_reason": "",
+    "page_count": 1,
+    "chunk_count": 4,
+    "content_hash": "eed39dd48c9b",
+    "ingestion_timestamp": "2026-08-30T13:03:43.831159",
+    "metadata": {
+      "document_id": "eed39dd48c9b",
+      "title": "Aerobic system of Rice cultivation",
+      "authority": "ICAR-IIRR",
+      "source": "IIRR Technologies",
+      "source_url": "https://www.icar-iirr.org/index.php/en/component/content/article/33-iirr-technologies/116-technology-13",
+      "language": "en",
+      "crop": "rice",
+      "category": "crop_guidelines",
+      "version_status": "under_review",
+      "published_date": "2021-03-05",
+      "last_updated_date": null
+    }
+  },
+  {
+    "document_id": "8f49e93f8bf8",
+    "filename": "sri_rice.txt",
+    "status": "success",
+    "failure_reason": "",
+    "page_count": 1,
+    "chunk_count": 3,
+    "content_hash": "8f49e93f8bf8",
+    "ingestion_timestamp": "2026-08-30T13:03:43.836985",
+    "metadata": {
+      "document_id": "8f49e93f8bf8",
+      "title": "SRI Method",
+      "authority": "ICAR-IIRR",
+      "source": "IIRR Technologies",
+      "source_url": "https://icar-iirr.org/index.php/en/component/content/article/33-iirr-technologies/111-technology-8",
+      "language": "en",
+      "crop": "rice",
+      "category": "crop_guidelines",
+      "version_status": "under_review",
+      "published_date": "2021-03-05",
+      "last_updated_date": null
+    }
+  }
+]

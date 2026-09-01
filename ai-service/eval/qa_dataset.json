@@ -1,0 +1,56 @@
+[
+  {
+    "question": "What type of soil is suitable for rice?",
+    "language": "en",
+    "crop": "rice",
+    "category": "soil",
+    "expected_relevant_source": "PENDING_VERIFIED_SOURCE",
+    "expected_key_facts": ["PENDING_VERIFIED_FACTS"],
+    "acceptable_answer_criteria": "Must mention soil type, water retention, and pH based on verified ICAR document."
+  },
+  {
+    "question": "What are the major growth stages of cotton?",
+    "language": "en",
+    "crop": "cotton",
+    "category": "crop_guidelines",
+    "expected_relevant_source": "PENDING_VERIFIED_SOURCE",
+    "expected_key_facts": ["PENDING_VERIFIED_FACTS"],
+    "acceptable_answer_criteria": "Must list physiological stages sequentially."
+  },
+  {
+    "question": "What are common pest problems in chilli?",
+    "language": "en",
+    "crop": "chilli",
+    "category": "pest_disease",
+    "expected_relevant_source": "PENDING_VERIFIED_SOURCE",
+    "expected_key_facts": ["PENDING_VERIFIED_FACTS"],
+    "acceptable_answer_criteria": "Must list at least 3 major pests (e.g. thrips, mites)."
+  },
+  {
+    "question": "What soil conditions are suitable for groundnut?",
+    "language": "en",
+    "crop": "groundnut",
+    "category": "soil",
+    "expected_relevant_source": "PENDING_VERIFIED_SOURCE",
+    "expected_key_facts": ["PENDING_VERIFIED_FACTS"],
+    "acceptable_answer_criteria": "Must describe drainage requirements and pH."
+  },
+  {
+    "question": "వరి సాగుకు అనుకూలమైన నేలలు ఏవి?",
+    "language": "te",
+    "crop": "rice",
+    "category": "soil",
+    "expected_relevant_source": "PENDING_VERIFIED_SOURCE",
+    "expected_key_facts": ["PENDING_VERIFIED_FACTS"],
+    "acceptable_answer_criteria": "Must accurately translate rice soil requirements to Telugu."
+  },
+  {
+    "question": "कपास की प्रमुख विकास अवस्थाएँ क्या हैं?",
+    "language": "hi",
+    "crop": "cotton",
+    "category": "crop_guidelines",
+    "expected_relevant_source": "PENDING_VERIFIED_SOURCE",
+    "expected_key_facts": ["PENDING_VERIFIED_FACTS"],
+    "acceptable_answer_criteria": "Must list cotton stages in Hindi."
+  }
+]

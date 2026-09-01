@@ -1,0 +1,15 @@
+.env
+.env.*
+backend/.env
+ai-service/.env
+frontend/.env
+chroma_production_data/
+*.sqlite3
+__pycache__/
+*.pyc
+node_modules/
+dist/
+build/
+logs/
+*.log
+venv/
