@@ -1,0 +1,50 @@
+databases:
+  - name: agrisaarthi_postgres
+    databaseName: agrisaarthi
+    user: agrisaarthi_user
+    plan: free
+
+services:
+  # Backend (Node.js)
+  - type: web
+    name: agrisaarthi_backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm run start
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agrisaarthi_postgres
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: BACKEND_PORT
+        value: 3001
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://your-vercel-frontend-url.vercel.app # TODO: Update this after Vercel deployment
+      - key: AI_SERVICE_URL
+        value: https://agrisaarthi-ai.onrender.com # Automatically generated URL (change if needed)
+
+  # AI Service (Python/FastAPI)
+  - type: web
+    name: agrisaarthi_ai
+    env: python
+    rootDir: ai-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false # User must enter this in Render dashboard manually
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agrisaarthi_postgres
+          property: connectionString
+      - key: CHROMA_HOST
+        value: localhost # Free tier Render doesn't support easy persistent disk across instances, so local ephemeral or external vector DB is needed.
+      - key: CHROMA_PORT
+        value: 8000
