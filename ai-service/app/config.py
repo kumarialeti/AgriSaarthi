@@ -12,8 +12,8 @@ class Settings(BaseSettings):
 
     # Gemini
     gemini_api_key: Optional[str] = None
-    gemini_model: str = "gemini-3.6-flash"
-    gemini_vision_model: str = "gemini-3.6-flash"
+    gemini_model: str = "gemini-3.7-flash"
+    gemini_vision_model: str = "gemini-3.7-flash"
 
     # Groq (Primary LLM)
     groq_api_key: Optional[str] = None
