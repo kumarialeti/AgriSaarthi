@@ -32,9 +32,16 @@ const app = express();
 const httpServer = createServer(app);
 
 // ─── Socket.io ────────────────────────────────────────────────────
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://agri-saarthi-one.vercel.app',
+  process.env.CORS_ORIGIN,
+  process.env.SOCKET_IO_CORS_ORIGIN
+].filter(Boolean);
+
 const io = new SocketServer(httpServer, {
   cors: {
-    origin: process.env.SOCKET_IO_CORS_ORIGIN || 'http://localhost:5173',
+    origin: allowedOrigins,
     credentials: true,
   },
   transports: ['websocket', 'polling'],
@@ -72,7 +79,7 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: allowedOrigins,
   credentials: true,
 }));
 
