@@ -65,6 +65,56 @@ export const getLiveMarketPrices = async (req, res, next) => {
 
     if (!rawData) {
       const status = lastErr?.response?.status;
+      
+      // Fallback to local database if API is down
+      if (!status || status >= 500) {
+        logger.warn('Market API unavailable (502/503), falling back to local database.');
+        try {
+          // Find crop ID by name
+          let cropId = null;
+          if (commodity) {
+            const cRes = await query('SELECT id FROM crops WHERE name_en ILIKE $1 OR name_te ILIKE $1 OR name_hi ILIKE $1 LIMIT 1', [`%${commodity}%`]);
+            if (cRes.rows.length) cropId = cRes.rows[0].id;
+          }
+          
+          let sql = `
+            SELECT mp.*, m.name as market_name, m.district, m.state
+            FROM market_prices mp
+            JOIN markets m ON m.id = mp.market_id
+          `;
+          const params = [];
+          if (cropId) {
+            params.push(cropId);
+            sql += ` WHERE mp.crop_id = $1`;
+          }
+          sql += ` ORDER BY mp.price_date DESC LIMIT ${Math.min(parseInt(limit, 10) || 10, 50)}`;
+          
+          const dbRes = await query(sql, params);
+          if (dbRes.rows.length) {
+            const normalized = dbRes.rows.map(r => ({
+              state: r.state,
+              district: r.district,
+              market: r.market_name,
+              commodity: commodity || 'Various',
+              variety: 'Local (Historical)',
+              arrival_date: r.price_date,
+              min_price_quintal: r.min_price_quintal,
+              max_price_quintal: r.max_price_quintal,
+              modal_price_quintal: r.modal_price_quintal,
+              source: 'Offline Database',
+            }));
+            return res.json({
+              success: true,
+              status: 'success',
+              data: normalized,
+              note: 'Live government API is down. Showing recent offline prices from our database.',
+            });
+          }
+        } catch (fallbackErr) {
+          logger.error('Fallback DB query failed', { error: fallbackErr.message });
+        }
+      }
+
       const msg = status === 401
         ? 'Market API authentication failed. Check MARKET_API_KEY.'
         : 'Live market data is temporarily unavailable.';
