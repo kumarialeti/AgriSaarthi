@@ -34,8 +34,8 @@ def get_llm(temperature: float = 0.1):
 # ─── Language-Aware System Prompts ────────────────────────────────
 FINAL_RESPONSE_PROMPTS = {
     "en": "You are AgriSaarthi AI, an expert agricultural assistant. Synthesize the following agent evidence into a clear, farmer-friendly response. Never expose internal reasoning or chain of thought. If insufficient data is provided, state clearly that you do not have enough information.",
-    "te": "మీరు అగ్రిసారథి AI, నిపుణ వ్యవసాయ సహాయకుడు. కింది ఏజెంట్ ఆధారాలను స్పష్టమైన, రైతుకు అనుకూలమైన ప్రతిస్పందనగా సంశ్లేషణ చేయండి. అంతర్గత తార్కికతను ఎప్పుడూ బహిర్గతం చేయవద్దు. తగినంత సమాచారం లేకపోతే, స్పష్టంగా చెప్పండి.",
-    "hi": "आप एग्रीसारथी एआई हैं, एक विशेषज्ञ कृषि सहायक। निम्नलिखित एजेंट साक्ष्यों को स्पष्ट, किसान-अनुकूल प्रतिक्रिया में संश्लेषित करें। कभी भी आंतरिक तर्क को उजागर न करें। यदि अपर्याप्त जानकारी है, तो स्पष्ट रूप से बताएं।"
+    "te": "CRITICAL INSTRUCTION: You MUST respond ONLY in the Telugu language. Do not output any English text. మీరు అగ్రిసారథి AI, నిపుణ వ్యవసాయ సహాయకుడు. కింది ఏజెంట్ ఆధారాలను స్పష్టమైన, రైతుకు అనుకూలమైన ప్రతిస్పందనగా సంశ్లేషణ చేయండి మరియు మొత్తం సమాచారాన్ని తెలుగులోకి అనువదించండి. అంతర్గత తార్కికతను ఎప్పుడూ బహిర్గతం చేయవద్దు. తగినంత సమాచారం లేకపోతే, స్పష్టంగా చెప్పండి.",
+    "hi": "CRITICAL INSTRUCTION: You MUST respond ONLY in the Hindi language. Do not output any English text. आप एग्रीसारथी एआई हैं, एक विशेषज्ञ कृषि सहायक। निम्नलिखित एजेंट साक्ष्यों को स्पष्ट, किसान-अनुकूल प्रतिक्रिया में संश्लेषित करें और सभी जानकारी का हिंदी में अनुवाद करें। कभी भी आंतरिक तर्क को उजागर न करें। यदि अपर्याप्त जानकारी है, तो स्पष्ट रूप से बताएं।"
 }
 
 # ─── Coordinate Extraction Helpers ────────────────────────────────
@@ -376,7 +376,7 @@ def final_response_generator(state: AgentState) -> AgentState:
         
         Write a friendly follow-up question asking the farmer to provide these specific details.
         Do not answer the original question. Just ask for the missing information.
-        Respond ONLY in this language code: {lang}.
+        CRITICAL INSTRUCTION: You MUST respond ONLY in this language code: {lang}. Do not use English if {lang} is not 'en'.
         """
         res = llm.invoke([HumanMessage(content=prompt)])
         content = res.content
