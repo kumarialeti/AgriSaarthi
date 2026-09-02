@@ -14,7 +14,16 @@ export const createOrUpdateFarmerProfile = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
 
-    const { full_name, phone, village, mandal, district, state, pincode, total_land_acres, location_lat, location_lng, farming_experience_years, farming_preference } = req.body;
+    const { full_name, village, mandal, district, state, pincode, farming_preference } = req.body;
+    let { phone, total_land_acres, location_lat, location_lng, farming_experience_years } = req.body;
+    
+    // Convert empty strings to null
+    if (phone === '') phone = null;
+    if (total_land_acres === '') total_land_acres = null;
+    if (location_lat === '') location_lat = null;
+    if (location_lng === '') location_lng = null;
+    if (farming_experience_years === '') farming_experience_years = null;
+
     const userId = req.user.id;
 
     const result = await query(

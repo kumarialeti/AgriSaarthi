@@ -26,7 +26,15 @@ export const createSoilReport = async (req, res, next) => {
       return res.status(400).json({ success: false, error: 'Complete your farmer profile first.' });
     }
 
-    const { ph, nitrogen_kg_ha, phosphorus_kg_ha, potassium_kg_ha, organic_carbon_pct, ec_ds_m, farmer_crop_id } = req.body;
+    const { ph, farmer_crop_id } = req.body;
+    let { nitrogen_kg_ha, phosphorus_kg_ha, potassium_kg_ha, organic_carbon_pct, ec_ds_m } = req.body;
+    
+    if (nitrogen_kg_ha === '') nitrogen_kg_ha = null;
+    if (phosphorus_kg_ha === '') phosphorus_kg_ha = null;
+    if (potassium_kg_ha === '') potassium_kg_ha = null;
+    if (organic_carbon_pct === '') organic_carbon_pct = null;
+    if (ec_ds_m === '') ec_ds_m = null;
+
     const farmerId = farmerRes.rows[0].id;
 
     const result = await query(
@@ -130,7 +138,14 @@ export const getMySoilReports = async (req, res, next) => {
 export const updateSoilReport = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { ph, nitrogen_kg_ha, phosphorus_kg_ha, potassium_kg_ha, organic_carbon_pct, ec_ds_m } = req.body;
+    const { ph } = req.body;
+    let { nitrogen_kg_ha, phosphorus_kg_ha, potassium_kg_ha, organic_carbon_pct, ec_ds_m } = req.body;
+    
+    if (nitrogen_kg_ha === '') nitrogen_kg_ha = null;
+    if (phosphorus_kg_ha === '') phosphorus_kg_ha = null;
+    if (potassium_kg_ha === '') potassium_kg_ha = null;
+    if (organic_carbon_pct === '') organic_carbon_pct = null;
+    if (ec_ds_m === '') ec_ds_m = null;
     const farmerRes = await query('SELECT id FROM farmer_profiles WHERE user_id=$1', [req.user.id]);
 
     const result = await query(
