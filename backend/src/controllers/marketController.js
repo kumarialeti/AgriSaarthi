@@ -7,7 +7,7 @@ const MARKET_API_BASE = process.env.MARKET_API_BASE_URL
   || 'https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070';
 const MARKET_TIMEOUT = parseInt(process.env.MARKET_API_TIMEOUT || '10', 10) * 1000;
 // Read per-request so tests can override via process.env
-const getMarketApiKey = () => process.env.MARKET_API_KEY;
+const getMarketApiKey = () => process.env.MARKET_API_KEY !== undefined ? process.env.MARKET_API_KEY : '579b464db66ec23bdd0000014c1010538683416177e72b0b4adad7a0';
 const getMarketRetries = () => parseInt(process.env.MARKET_API_RETRIES ?? '2', 10);
 
 // ─── Live Market Prices (Agmarknet / data.gov.in) ──────────────

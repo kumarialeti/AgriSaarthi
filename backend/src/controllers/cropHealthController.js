@@ -3,7 +3,7 @@ import { logger } from '../utils/logger.js';
 import axios from 'axios';
 import path from 'path';
 
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8001';
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'https://agrisaarthi-ai.onrender.com';
 
 export const analyzeCropImage = async (req, res, next) => {
   try {

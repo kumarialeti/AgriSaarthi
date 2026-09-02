@@ -2,7 +2,7 @@ import { query } from '../db/pool.js';
 import axios from 'axios';
 import { logger } from '../utils/logger.js';
 
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8001';
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'https://agrisaarthi-ai.onrender.com';
 
 // ─── Chat session management ────────────────────────────────────
 export const startSession = async (req, res, next) => {
