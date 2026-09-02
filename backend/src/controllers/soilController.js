@@ -8,11 +8,11 @@ const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8001';
 
 export const validateSoilManual = [
   body('ph').isFloat({ min: 0, max: 14 }).withMessage('pH must be between 0 and 14'),
-  body('nitrogen_kg_ha').optional().isFloat({ min: 0 }).withMessage('Nitrogen must be positive'),
-  body('phosphorus_kg_ha').optional().isFloat({ min: 0 }),
-  body('potassium_kg_ha').optional().isFloat({ min: 0 }),
-  body('organic_carbon_pct').optional().isFloat({ min: 0, max: 100 }),
-  body('ec_ds_m').optional().isFloat({ min: 0 }),
+  body('nitrogen_kg_ha').optional({ checkFalsy: true }).isFloat({ min: 0 }).withMessage('Nitrogen must be positive'),
+  body('phosphorus_kg_ha').optional({ checkFalsy: true }).isFloat({ min: 0 }),
+  body('potassium_kg_ha').optional({ checkFalsy: true }).isFloat({ min: 0 }),
+  body('organic_carbon_pct').optional({ checkFalsy: true }).isFloat({ min: 0, max: 100 }),
+  body('ec_ds_m').optional({ checkFalsy: true }).isFloat({ min: 0 }),
 ];
 
 // ─── Manual soil entry ─────────────────────────────────────────

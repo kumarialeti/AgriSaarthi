@@ -5,8 +5,8 @@ import { logger } from '../utils/logger.js';
 // ─── Farmer Profile ──────────────────────────────────────────────
 export const validateFarmerProfile = [
   body('full_name').trim().notEmpty().withMessage('Full name is required'),
-  body('phone').optional().matches(/^[6-9]\d{9}$/).withMessage('Invalid Indian phone number'),
-  body('total_land_acres').optional().isFloat({ min: 0.1, max: 9999 }).withMessage('Invalid land area'),
+  body('phone').optional({ checkFalsy: true }).matches(/^[6-9]\d{9}$/).withMessage('Invalid Indian phone number'),
+  body('total_land_acres').optional({ checkFalsy: true }).isFloat({ min: 0.1, max: 9999 }).withMessage('Invalid land area'),
 ];
 
 export const createOrUpdateFarmerProfile = async (req, res, next) => {
