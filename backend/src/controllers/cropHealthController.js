@@ -35,7 +35,7 @@ export const analyzeCropImage = async (req, res, next) => {
     let aiError = null;
     try {
       const aiRes = await axios.post(
-        `${AI_SERVICE_URL}/ai/analyze-crop`,
+        `${AI_SERVICE_URL}/ai/analyze-crop-path`,
         {
           image_path: req.file.path,
           farmer_crop_id,
