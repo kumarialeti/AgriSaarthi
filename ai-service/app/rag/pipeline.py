@@ -14,28 +14,35 @@ logger = logging.getLogger(__name__)
 # ─── Embedding Model ──────────────────────────────────────────────
 _embedding_model: Optional[SentenceTransformer] = None
 
-def get_embedding_model() -> SentenceTransformer:
+def get_embedding_model() -> Optional[SentenceTransformer]:
     global _embedding_model
     if _embedding_model is None:
-        logger.info(f"Loading embedding model: {settings.embedding_model}")
-        _embedding_model = SentenceTransformer(settings.embedding_model)
+        try:
+            logger.info(f"Loading embedding model: {settings.embedding_model}")
+            _embedding_model = SentenceTransformer(settings.embedding_model)
+        except Exception as e:
+            logger.warning(f"Embedding model unavailable ({e}). RAG will use fallback.")
+            _embedding_model = None
     return _embedding_model
 
 
 # ─── ChromaDB Client ─────────────────────────────────────────────
 _chroma_client: Optional[chromadb.HttpClient] = None
 
-def get_chroma_client() -> chromadb.HttpClient:
+def get_chroma_client() -> Optional[chromadb.HttpClient]:
     global _chroma_client
     if _chroma_client is None:
         try:
-            _chroma_client = chromadb.HttpClient(
+            client = chromadb.HttpClient(
                 host=settings.chroma_host,
                 port=settings.chroma_port,
             )
+            # Fast heartbeat check to prevent hanging if host/port is unreachable
+            client.heartbeat()
+            _chroma_client = client
             logger.info(f"ChromaDB connected at {settings.chroma_host}:{settings.chroma_port}")
         except Exception as e:
-            logger.warning(f"ChromaDB unavailable: {e}. RAG will use fallback.")
+            logger.warning(f"ChromaDB unavailable ({e}). RAG will use fallback without hanging.")
             _chroma_client = None
     return _chroma_client
 
