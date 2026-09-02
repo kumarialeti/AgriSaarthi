@@ -169,7 +169,7 @@ export const getLiveMarketPrices = async (req, res, next) => {
 // ─── Market Prices ─────────────────────────────────────────────
 export const getMarketPrices = async (req, res, next) => {
   try {
-    const { crop_id, district, days = 7 } = req.query;
+    const { crop_id, district, days = 365 } = req.query;
 
     let sql = `
       SELECT mp.*, m.name as market_name, m.district, m.state, m.latitude, m.longitude,
