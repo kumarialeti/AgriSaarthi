@@ -38,9 +38,8 @@ async def analyze_crop_image(
         return {"analysis_available": False, "error": "Image file not found."}
 
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=settings.gemini_api_key)
-        model = genai.GenerativeModel(settings.gemini_vision_model)
+        from google import genai
+        client = genai.Client(api_key=settings.gemini_api_key)
 
         # Upload image
         with open(image_path, "rb") as f:
@@ -90,7 +89,10 @@ IMPORTANT:
         import io
 
         img = PIL.Image.open(io.BytesIO(image_bytes))
-        response = model.generate_content([prompt, img])
+        response = client.models.generate_content(
+            model=settings.gemini_vision_model,
+            contents=[prompt, img]
+        )
 
         # Parse JSON from response
         import json
@@ -143,10 +145,9 @@ async def extract_soil_report_text(
             text = "\n".join([page.extract_text() for page in reader.pages])
         else:
             # Image-based soil report
-            import google.generativeai as genai
+            from google import genai
             import PIL.Image
-            genai.configure(api_key=settings.gemini_api_key)
-            model = genai.GenerativeModel(settings.gemini_vision_model)
+            client = genai.Client(api_key=settings.gemini_api_key)
             img = PIL.Image.open(file_path)
 
             extract_prompt = """Extract soil test parameters from this soil report image.
@@ -154,7 +155,10 @@ Return ONLY JSON in this format:
 {"ph": null, "nitrogen_kg_ha": null, "phosphorus_kg_ha": null, "potassium_kg_ha": null, "organic_carbon_pct": null, "ec_ds_m": null}
 Use null for any parameter not found. Convert units if needed (e.g., mg/kg to kg/ha using standard conversion)."""
 
-            response = model.generate_content([extract_prompt, img])
+            response = client.models.generate_content(
+                model=settings.gemini_vision_model,
+                contents=[extract_prompt, img]
+            )
             text = response.text
 
         import json, re
