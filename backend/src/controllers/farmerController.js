@@ -65,7 +65,7 @@ export const validateCrop = [
   body('crop_id').isUUID().withMessage('Valid crop_id required'),
   body('acreage').isFloat({ min: 0.1 }).withMessage('Valid acreage required'),
   body('status').optional().isIn(['PLANNED','GROWING','HARVESTED','FAILED']),
-  body('irrigation_type').optional().isIn(['Drip','Flood','Sprinkler','Rainfed','Canal','Borewell']),
+  body('irrigation_type').optional(),
 ];
 
 export const createCrop = async (req, res, next) => {
@@ -79,23 +79,19 @@ export const createCrop = async (req, res, next) => {
     }
 
     const { crop_id, acreage, status, notes } = req.body;
-    let { sowing_date, expected_harvest_date, irrigation_type, soil_type, field_id, variety, growth_stage, previous_crop } = req.body;
+    let { sowing_date, expected_harvest_date, irrigation_type, soil_type } = req.body;
     
     if (sowing_date === '') sowing_date = null;
     if (expected_harvest_date === '') expected_harvest_date = null;
     if (irrigation_type === '') irrigation_type = null;
     if (soil_type === '') soil_type = null;
-    if (field_id === '') field_id = null;
-    if (variety === '') variety = null;
-    if (growth_stage === '') growth_stage = null;
-    if (previous_crop === '') previous_crop = null;
 
     const farmerId = farmerRes.rows[0].id;
 
     const result = await query(
-      `INSERT INTO farmer_crops (farmer_id, crop_id, acreage, sowing_date, expected_harvest_date, irrigation_type, soil_type, status, notes, field_id, variety, growth_stage, previous_crop)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
-      [farmerId, crop_id, acreage, sowing_date, expected_harvest_date, irrigation_type, soil_type, status || 'PLANNED', notes, field_id, variety, growth_stage, previous_crop]
+      `INSERT INTO farmer_crops (farmer_id, crop_id, acreage, sowing_date, expected_harvest_date, irrigation_type, soil_type, status, notes)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+      [farmerId, crop_id, acreage, sowing_date, expected_harvest_date, irrigation_type, soil_type, status || 'PLANNED', notes]
     );
 
     res.status(201).json({ success: true, data: result.rows[0] });
@@ -108,10 +104,9 @@ export const getMyCrops = async (req, res, next) => {
     if (!farmerRes.rows.length) return res.json({ success: true, data: [] });
 
     const result = await query(
-      `SELECT fc.*, c.name_en, c.name_te, c.name_hi, c.category, c.season, f.name as field_name
+      `SELECT fc.*, c.name_en, c.name_te, c.name_hi, c.category, c.season
        FROM farmer_crops fc 
        JOIN crops c ON c.id = fc.crop_id
-       LEFT JOIN fields f ON f.id = fc.field_id
        WHERE fc.farmer_id = $1 ORDER BY fc.created_at DESC`,
       [farmerRes.rows[0].id]
     );
@@ -122,26 +117,26 @@ export const getMyCrops = async (req, res, next) => {
 
 export const updateCrop = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
+
     const { id } = req.params;
     const farmerRes = await query('SELECT id FROM farmer_profiles WHERE user_id=$1', [req.user.id]);
     if (!farmerRes.rows.length) return res.status(404).json({ success: false, error: 'Profile not found.' });
 
     const { acreage, status, notes } = req.body;
-    let { sowing_date, expected_harvest_date, irrigation_type, soil_type, field_id, variety, growth_stage, previous_crop } = req.body;
+    let { sowing_date, expected_harvest_date, irrigation_type, soil_type } = req.body;
     
     if (sowing_date === '') sowing_date = null;
     if (expected_harvest_date === '') expected_harvest_date = null;
     if (irrigation_type === '') irrigation_type = null;
     if (soil_type === '') soil_type = null;
-    if (field_id === '') field_id = null;
-    if (variety === '') variety = null;
-    if (growth_stage === '') growth_stage = null;
-    if (previous_crop === '') previous_crop = null;
+    
     const result = await query(
       `UPDATE farmer_crops SET acreage=$1, sowing_date=$2, expected_harvest_date=$3,
-       irrigation_type=$4, soil_type=$5, status=$6, notes=$7, field_id=$8, variety=$9, growth_stage=$10, previous_crop=$11, updated_at=NOW()
-       WHERE id=$12 AND farmer_id=$13 RETURNING *`,
-      [acreage, sowing_date, expected_harvest_date, irrigation_type, soil_type, status, notes, field_id, variety, growth_stage, previous_crop, id, farmerRes.rows[0].id]
+       irrigation_type=$4, soil_type=$5, status=$6, notes=$7, updated_at=NOW()
+       WHERE id=$8 AND farmer_id=$9 RETURNING *`,
+      [acreage, sowing_date, expected_harvest_date, irrigation_type, soil_type, status, notes, id, farmerRes.rows[0].id]
     );
 
     if (!result.rows.length) return res.status(404).json({ success: false, error: 'Crop record not found.' });
