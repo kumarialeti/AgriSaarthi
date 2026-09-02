@@ -74,27 +74,53 @@ export const analyzeCropImage = async (req, res, next) => {
       });
     }
 
-    // Store health report
-    const reportRes = await query(
-      `INSERT INTO crop_health_reports 
-       (farmer_crop_id, image_url, analysis_result, detected_issue, confidence, severity, ai_response, sources)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [
-        farmer_crop_id || null,
-        imageUrl,
-        JSON.stringify(analysis),
-        analysis.detected_issue || null,
-        analysis.confidence || null,
-        analysis.severity || null,
-        analysis.response || null,
-        JSON.stringify(analysis.sources || []),
-      ]
-    );
+    // Parse numeric confidence score for database DECIMAL column
+    let confidenceScore = null;
+    if (typeof analysis.confidence_score === 'number') {
+      confidenceScore = analysis.confidence_score;
+    } else if (typeof analysis.confidence === 'number') {
+      confidenceScore = analysis.confidence;
+    } else if (analysis.confidence === 'high') {
+      confidenceScore = 0.9;
+    } else if (analysis.confidence === 'medium') {
+      confidenceScore = 0.7;
+    } else if (analysis.confidence === 'low') {
+      confidenceScore = 0.4;
+    }
+
+    // Store health report (wrapped in try/catch to ensure user gets AI response even if DB save has constraints)
+    let reportRecord = null;
+    try {
+      const reportRes = await query(
+        `INSERT INTO crop_health_reports 
+         (farmer_crop_id, image_url, analysis_result, detected_issue, confidence, severity, ai_response, sources)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+        [
+          farmer_crop_id || null,
+          imageUrl,
+          JSON.stringify(analysis),
+          analysis.detected_issue || 'General Crop Analysis',
+          confidenceScore,
+          analysis.severity || 'moderate',
+          analysis.response || null,
+          JSON.stringify(analysis.sources || []),
+        ]
+      );
+      reportRecord = reportRes.rows[0];
+    } catch (dbErr) {
+      logger.warn('Failed to persist crop_health_report to database', { error: dbErr.message });
+    }
 
     res.status(201).json({
       success: true,
       data: {
-        report: reportRes.rows[0],
+        report: reportRecord || {
+          image_url: imageUrl,
+          detected_issue: analysis.detected_issue,
+          confidence: confidenceScore,
+          severity: analysis.severity,
+          ai_response: analysis.response,
+        },
         analysis,
       },
     });

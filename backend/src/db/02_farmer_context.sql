@@ -39,3 +39,6 @@ ADD COLUMN IF NOT EXISTS field_id UUID REFERENCES fields(id) ON DELETE SET NULL,
 ADD COLUMN IF NOT EXISTS variety VARCHAR(255),
 ADD COLUMN IF NOT EXISTS growth_stage VARCHAR(100),
 ADD COLUMN IF NOT EXISTS previous_crop VARCHAR(255);
+
+-- 4. Alter crop_health_reports (allow general crop scans without pre-selected crop)
+ALTER TABLE crop_health_reports ALTER COLUMN farmer_crop_id DROP NOT NULL;
