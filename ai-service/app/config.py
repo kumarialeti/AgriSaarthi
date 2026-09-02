@@ -12,8 +12,8 @@ class Settings(BaseSettings):
 
     # Gemini
     gemini_api_key: Optional[str] = None
-    gemini_model: str = "gemini-3.6-flash"
-    gemini_vision_model: str = "gemini-3.6-flash"
+    gemini_model: str = "gemini-1.5-flash"
+    gemini_vision_model: str = "gemini-1.5-flash"
 
     # ChromaDB
     chroma_host: str = "localhost"
