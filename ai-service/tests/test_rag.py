@@ -57,13 +57,13 @@ def test_metadata_schema():
 
 def test_distance_to_relevance():
     from app.rag.pipeline import rag
-    # Valid bounds checking
+    # Valid bounds checking for Cosine distance (0.0 to 2.0)
     assert rag._distance_to_relevance(0.0) == 1.0
-    assert rag._distance_to_relevance(50.0) == 0.0
-    assert rag._distance_to_relevance(100.0) == 0.0 # Bounded at 0.0
-    assert rag._distance_to_relevance(-10.0) == 1.0 # Bounded at 1.0
+    assert rag._distance_to_relevance(2.0) == 0.0
+    assert rag._distance_to_relevance(3.0) == 0.0 # Bounded at 0.0
+    assert rag._distance_to_relevance(-1.0) == 1.0 # Bounded at 1.0
     
     # Meaningful distances
-    assert rag._distance_to_relevance(25.0) == 0.50
-    assert rag._distance_to_relevance(10.0) == 0.80
-    assert rag._distance_to_relevance(40.0) == 0.20
+    assert rag._distance_to_relevance(1.0) == 0.50
+    assert rag._distance_to_relevance(0.40) == 0.80
+    assert rag._distance_to_relevance(1.60) == 0.20

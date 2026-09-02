@@ -1,0 +1,12 @@
+{
+  "agrisaarthi_crops": {
+    "count": 33,
+    "metadata": null
+  },
+  "agrisaarthi_schemes": {
+    "error": "Collection [agrisaarthi_schemes] does not exist"
+  },
+  "agrisaarthi_soil": {
+    "error": "Collection [agrisaarthi_soil] does not exist"
+  }
+}

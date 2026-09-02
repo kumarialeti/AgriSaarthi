@@ -6,14 +6,12 @@ python-dotenv>=1.0.0
 # LangChain / LangGraph
 langchain>=0.1.0
 langchain-google-genai>=0.0.6
+langchain-groq>=0.1.0
 langchain-community>=0.0.13
 langgraph>=0.0.26
 
 # Vector DB
 chromadb>=0.4.20
-
-# Embeddings
-sentence-transformers>=2.3.1
 
 # Document processing
 pypdf>=3.17.1

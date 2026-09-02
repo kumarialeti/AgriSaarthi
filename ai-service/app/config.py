@@ -12,18 +12,22 @@ class Settings(BaseSettings):
 
     # Gemini
     gemini_api_key: Optional[str] = None
-    gemini_model: str = "gemini-1.5-flash"
-    gemini_vision_model: str = "gemini-1.5-flash"
+    gemini_model: str = "gemini-3.6-flash"
+    gemini_vision_model: str = "gemini-3.6-flash"
+
+    # Groq (Primary LLM)
+    groq_api_key: Optional[str] = None
+    groq_model: str = "openai/gpt-oss-120b"
 
     # ChromaDB
     chroma_host: str = "localhost"
     chroma_port: int = 8000
-    chroma_collection_crops: str = "agrisaarthi_crops"
-    chroma_collection_schemes: str = "agrisaarthi_schemes"
-    chroma_collection_soil: str = "agrisaarthi_soil"
+    chroma_collection_crops: str = "agrisaarthi_crops_v2"
+    chroma_collection_schemes: str = "agrisaarthi_schemes_v2"
+    chroma_collection_soil: str = "agrisaarthi_soil_v2"
 
     # Embeddings
-    embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    embedding_model: str = "models/gemini-embedding-2"
 
     # ── Weather (Open-Meteo — no API key required) ─────────────────
     weather_api_base_url: str = "https://api.open-meteo.com/v1"

@@ -6,20 +6,23 @@ import logging
 from typing import List, Dict, Any, Optional
 import chromadb
 from chromadb.config import Settings as ChromaSettings
-from sentence_transformers import SentenceTransformer
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from app.config import settings
 
 logger = logging.getLogger(__name__)
 
 # ─── Embedding Model ──────────────────────────────────────────────
-_embedding_model: Optional[SentenceTransformer] = None
+_embedding_model: Optional[GoogleGenerativeAIEmbeddings] = None
 
-def get_embedding_model() -> Optional[SentenceTransformer]:
+def get_embedding_model() -> Optional[GoogleGenerativeAIEmbeddings]:
     global _embedding_model
     if _embedding_model is None:
         try:
-            logger.info(f"Loading embedding model: {settings.embedding_model}")
-            _embedding_model = SentenceTransformer(settings.embedding_model)
+            logger.info(f"Loading Google GenAI embedding model: {settings.embedding_model}")
+            _embedding_model = GoogleGenerativeAIEmbeddings(
+                model=settings.embedding_model,
+                google_api_key=settings.gemini_api_key
+            )
         except Exception as e:
             logger.warning(f"Embedding model unavailable ({e}). RAG will use fallback.")
             _embedding_model = None
@@ -71,11 +74,10 @@ class RAGPipeline:
 
     def _distance_to_relevance(self, distance: float) -> float:
         """
-        Converts ChromaDB's unnormalized L2 distance to a bounded 0.0-1.0 relevance score.
-        For paraphrase-multilingual-MiniLM-L12-v2, vector norms are ~5.3.
-        cosine_sim ~ 1 - (L2^2 / 50.0)
+        Converts ChromaDB's Cosine distance (1.0 - cosine_similarity) to a bounded 0.0-1.0 relevance score.
+        Google Gemini embeddings are normalized, so cosine distance ranges from 0.0 (identical) to 2.0 (opposite).
         """
-        score = 1.0 - (distance / 50.0)
+        score = 1.0 - (distance / 2.0)
         return round(max(0.0, min(1.0, score)), 4)
 
     def retrieve(
@@ -97,7 +99,7 @@ class RAGPipeline:
 
         try:
             collection = self.client.get_or_create_collection(collection_name)
-            query_embedding = self.model.encode([query])[0].tolist()
+            query_embedding = self.model.embed_query(query)
 
             kwargs = {
                 "query_embeddings": [query_embedding],
@@ -139,7 +141,7 @@ class RAGPipeline:
 
         try:
             collection = self.client.get_or_create_collection(collection_name)
-            embeddings = self.model.encode(documents).tolist()
+            embeddings = self.model.embed_documents(documents)
             collection.upsert(
                 documents=documents,
                 metadatas=metadatas,

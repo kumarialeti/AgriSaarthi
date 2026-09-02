@@ -8,7 +8,7 @@ Mocks removed. All live-data failures produce explicit data_unavailable status.
 import logging
 from typing import Dict, Any, List, Optional
 from langchain_core.messages import HumanMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, END
 from app.config import settings
 from app.rag.retriever import DocumentRetriever
@@ -20,13 +20,15 @@ logger = logging.getLogger(__name__)
 
 # ─── LLM Factory ──────────────────────────────────────────────────
 def get_llm(temperature: float = 0.1):
-    if not settings.gemini_api_key:
-        raise ValueError("GEMINI_API_KEY not configured")
-    return ChatGoogleGenerativeAI(
-        model=settings.gemini_model,
-        google_api_key=settings.gemini_api_key,
+    if not settings.groq_api_key:
+        raise ValueError("GROQ_API_KEY not configured")
+    # ChatGroq supports rate limit handling natively with max_retries
+    return ChatGroq(
+        model_name=settings.groq_model,
+        api_key=settings.groq_api_key,
         temperature=temperature,
-        convert_system_message_to_human=True,
+        max_retries=3,
+        timeout=15.0
     )
 
 # ─── Language-Aware System Prompts ────────────────────────────────
