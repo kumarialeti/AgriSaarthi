@@ -78,7 +78,18 @@ export const createCrop = async (req, res, next) => {
       return res.status(400).json({ success: false, error: 'Complete your farmer profile first.' });
     }
 
-    const { crop_id, acreage, sowing_date, expected_harvest_date, irrigation_type, soil_type, status, notes, field_id, variety, growth_stage, previous_crop } = req.body;
+    const { crop_id, acreage, status, notes } = req.body;
+    let { sowing_date, expected_harvest_date, irrigation_type, soil_type, field_id, variety, growth_stage, previous_crop } = req.body;
+    
+    if (sowing_date === '') sowing_date = null;
+    if (expected_harvest_date === '') expected_harvest_date = null;
+    if (irrigation_type === '') irrigation_type = null;
+    if (soil_type === '') soil_type = null;
+    if (field_id === '') field_id = null;
+    if (variety === '') variety = null;
+    if (growth_stage === '') growth_stage = null;
+    if (previous_crop === '') previous_crop = null;
+
     const farmerId = farmerRes.rows[0].id;
 
     const result = await query(
@@ -115,7 +126,17 @@ export const updateCrop = async (req, res, next) => {
     const farmerRes = await query('SELECT id FROM farmer_profiles WHERE user_id=$1', [req.user.id]);
     if (!farmerRes.rows.length) return res.status(404).json({ success: false, error: 'Profile not found.' });
 
-    const { acreage, sowing_date, expected_harvest_date, irrigation_type, soil_type, status, notes, field_id, variety, growth_stage, previous_crop } = req.body;
+    const { acreage, status, notes } = req.body;
+    let { sowing_date, expected_harvest_date, irrigation_type, soil_type, field_id, variety, growth_stage, previous_crop } = req.body;
+    
+    if (sowing_date === '') sowing_date = null;
+    if (expected_harvest_date === '') expected_harvest_date = null;
+    if (irrigation_type === '') irrigation_type = null;
+    if (soil_type === '') soil_type = null;
+    if (field_id === '') field_id = null;
+    if (variety === '') variety = null;
+    if (growth_stage === '') growth_stage = null;
+    if (previous_crop === '') previous_crop = null;
     const result = await query(
       `UPDATE farmer_crops SET acreage=$1, sowing_date=$2, expected_harvest_date=$3,
        irrigation_type=$4, soil_type=$5, status=$6, notes=$7, field_id=$8, variety=$9, growth_stage=$10, previous_crop=$11, updated_at=NOW()
