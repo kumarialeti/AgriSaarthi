@@ -3,6 +3,8 @@ import { query } from '../db/pool.js';
 import { logger } from '../utils/logger.js';
 import axios from 'axios';
 import path from 'path';
+import fs from 'fs';
+import FormData from 'form-data';
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'https://agrisaarthi-ai.onrender.com';
 
@@ -81,10 +83,18 @@ export const uploadSoilReportFile = async (req, res, next) => {
     // Request text extraction from AI service
     let extractedData = {};
     try {
-      const aiRes = await axios.post(`${AI_SERVICE_URL}/ai/extract-soil-report`, {
-        file_path: req.file.path,
-        mime_type: req.file.mimetype,
-      }, { timeout: 45000 });
+      const formData = new FormData();
+      formData.append('file', fs.createReadStream(req.file.path), {
+        filename: path.basename(req.file.path),
+        contentType: req.file.mimetype || 'application/pdf',
+      });
+
+      const aiRes = await axios.post(`${AI_SERVICE_URL}/ai/extract-soil-file`, formData, {
+        headers: {
+          ...formData.getHeaders(),
+        },
+        timeout: 45000,
+      });
 
       extractedData = aiRes.data?.extracted || {};
     } catch (aiErr) {

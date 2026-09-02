@@ -2,6 +2,8 @@ import { query } from '../db/pool.js';
 import { logger } from '../utils/logger.js';
 import axios from 'axios';
 import path from 'path';
+import fs from 'fs';
+import FormData from 'form-data';
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'https://agrisaarthi-ai.onrender.com';
 
@@ -30,18 +32,29 @@ export const analyzeCropImage = async (req, res, next) => {
 
     const imageUrl = `/uploads/images/${path.basename(req.file.path)}`;
 
-    // Send to AI service for vision analysis
+    // Send to AI service for vision analysis using multipart/form-data
     let analysis = null;
     let aiError = null;
     try {
+      const formData = new FormData();
+      formData.append('image', fs.createReadStream(req.file.path), {
+        filename: path.basename(req.file.path),
+        contentType: req.file.mimetype || 'image/jpeg',
+      });
+      formData.append('language', language || req.user.language || 'en');
+      if (farmer_crop_id) {
+        formData.append('farmer_crop_id', String(farmer_crop_id));
+      }
+
       const aiRes = await axios.post(
-        `${AI_SERVICE_URL}/ai/analyze-crop-path`,
+        `${AI_SERVICE_URL}/ai/analyze-crop`,
+        formData,
         {
-          image_path: req.file.path,
-          farmer_crop_id,
-          language: language || req.user.language || 'en',
-        },
-        { timeout: 60000 }
+          headers: {
+            ...formData.getHeaders(),
+          },
+          timeout: 60000,
+        }
       );
       analysis = aiRes.data;
     } catch (err) {

@@ -154,12 +154,35 @@ What do these values mean for my crop? What should I do?"""
 # ─── Soil Report Extraction ────────────────────────────────────────
 @router.post("/extract-soil-report")
 async def extract_soil_report(request: SoilExtractRequest):
-    """Extract soil parameter values from uploaded PDF/image."""
+    """Extract soil parameter values from uploaded PDF/image (legacy file path)."""
     result = await extract_soil_report_text(
         file_path=request.file_path,
         mime_type=request.mime_type,
     )
     return result
+
+
+@router.post("/extract-soil-file")
+async def extract_soil_file(file: UploadFile = File(...)):
+    """Extract soil parameter values from multipart uploaded PDF/image."""
+    suffix = "." + (file.filename or "doc.pdf").split(".")[-1]
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        content = await file.read()
+        tmp.write(content)
+        tmp_path = tmp.name
+
+    try:
+        mime_type = file.content_type or "application/pdf"
+        result = await extract_soil_report_text(
+            file_path=tmp_path,
+            mime_type=mime_type,
+        )
+        return result
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except Exception:
+            pass
 
 
 # ─── Voice Transcription ───────────────────────────────────────────
