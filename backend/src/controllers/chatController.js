@@ -81,7 +81,6 @@ export const sendMessage = async (req, res, next) => {
     // Get farmer context for AI
     const farmerCtx = await query(
       `SELECT fp.full_name, fp.district, fp.state, fp.location_lat, fp.location_lng, fp.farming_experience_years, fp.farming_preference,
-              (SELECT json_agg(json_build_object('name', f.name, 'area', f.area, 'area_unit', f.area_unit, 'soil_type', f.soil_type, 'soil_ph', f.soil_ph, 'irrigation', f.irrigation_source)) FROM fields f WHERE f.farmer_id = fp.id) as fields,
               json_agg(json_build_object('crop', c.name_en, 'status', fc.status, 'acreage', fc.acreage, 'variety', fc.variety, 'growth_stage', fc.growth_stage)) as crops,
               (SELECT row_to_json(sr) FROM soil_reports sr WHERE sr.farmer_id = fp.id ORDER BY sr.created_at DESC LIMIT 1) as latest_soil
        FROM farmer_profiles fp
