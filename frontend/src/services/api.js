@@ -92,6 +92,8 @@ export const marketApi = {
 
 // ─── Buyers ───────────────────────────────────────────────────────
 export const buyerApi = {
+  getProfile:            () => api.get('/api/buyers/profile'),
+  updateProfile:         (data) => api.put('/api/buyers/profile', data),
   getOpenRequirements:   () => api.get('/api/buyers/open-requirements'),
   getFarmerMatches:      () => api.get('/api/buyers/matches'),
   findCooperative:       (reqId) => api.get(`/api/buyers/cooperative/${reqId}`),

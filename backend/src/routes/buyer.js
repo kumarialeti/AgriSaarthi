@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  createOrUpdateBuyerProfile, createRequirement, getMyRequirements,
+  getBuyerProfile, createOrUpdateBuyerProfile, createRequirement, getMyRequirements,
   validateRequirement, getFarmerMatches, findCooperativeOpportunity,
 } from '../controllers/buyerController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(authenticate);
 
 // Buyer profile
+router.get('/profile', authorize('BUYER'), getBuyerProfile);
 router.put('/profile', authorize('BUYER'), createOrUpdateBuyerProfile);
 
 // Requirements (buyer creates)

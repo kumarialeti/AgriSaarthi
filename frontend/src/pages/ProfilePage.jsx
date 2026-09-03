@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { farmerApi } from '../services/api';
+import { farmerApi, buyerApi } from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { User, MapPin, Phone, Save, CheckCircle } from 'lucide-react';
 
@@ -17,9 +17,11 @@ export default function ProfilePage() {
   const qClient = useQueryClient();
   const [saved, setSaved] = useState(false);
 
+  const isBuyer = user?.role === 'BUYER';
+
   const { data: profile, isLoading } = useQuery({
-    queryKey: ['farmerProfile'],
-    queryFn: () => farmerApi.getProfile().then(r => r.data.data),
+    queryKey: ['profile', user?.role],
+    queryFn: () => (isBuyer ? buyerApi.getProfile() : farmerApi.getProfile()).then(r => r.data.data),
     retry: false,
   });
 
@@ -36,9 +38,9 @@ export default function ProfilePage() {
   const updateForm = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
   const mutation = useMutation({
-    mutationFn: (data) => farmerApi.updateProfile(data),
+    mutationFn: (data) => isBuyer ? buyerApi.updateProfile(data) : farmerApi.updateProfile(data),
     onSuccess: () => {
-      qClient.invalidateQueries({ queryKey: ['farmerProfile'] });
+      qClient.invalidateQueries({ queryKey: ['profile', user?.role] });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     },
@@ -100,9 +102,23 @@ export default function ProfilePage() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="form-group">
-              <label className="form-label">{t('profile.fullName')}</label>
+              <label className="form-label">{isBuyer ? 'Full Name or Company Rep' : t('profile.fullName')}</label>
               <input type="text" className="form-input" value={form.full_name || ''} onChange={(e) => updateForm('full_name', e.target.value)} placeholder="Your full name" />
             </div>
+
+            {isBuyer && (
+              <div className="form-group">
+                <label className="form-label">Company Name</label>
+                <input type="text" className="form-input" value={form.company_name || ''} onChange={(e) => updateForm('company_name', e.target.value)} placeholder="Your Company Name" />
+              </div>
+            )}
+
+            {isBuyer && (
+              <div className="form-group">
+                <label className="form-label">GST Number</label>
+                <input type="text" className="form-input" value={form.gst_number || ''} onChange={(e) => updateForm('gst_number', e.target.value)} placeholder="GST Number" />
+              </div>
+            )}
 
             <div className="form-group">
               <label className="form-label">{t('profile.phone')}</label>
@@ -136,10 +152,12 @@ export default function ProfilePage() {
               <input type="text" className="form-input" value={form.pincode || ''} onChange={(e) => updateForm('pincode', e.target.value)} placeholder="522001" maxLength="6" />
             </div>
 
-            <div className="form-group">
-              <label className="form-label">{t('profile.totalLand')}</label>
-              <input type="number" className="form-input" value={form.total_land_acres || ''} onChange={(e) => updateForm('total_land_acres', e.target.value)} placeholder="0.0" min="0" step="0.1" />
-            </div>
+            {!isBuyer && (
+              <div className="form-group">
+                <label className="form-label">{t('profile.totalLand')}</label>
+                <input type="number" className="form-input" value={form.total_land_acres || ''} onChange={(e) => updateForm('total_land_acres', e.target.value)} placeholder="0.0" min="0" step="0.1" />
+              </div>
+            )}
           </div>
 
           <button type="submit" className="btn btn-primary" disabled={mutation.isPending} style={{ alignSelf: 'flex-start', minWidth: '160px' }}>

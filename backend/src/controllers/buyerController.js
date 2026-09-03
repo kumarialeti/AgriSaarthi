@@ -3,6 +3,13 @@ import { query, withTransaction } from '../db/pool.js';
 import { logger } from '../utils/logger.js';
 
 // ─── Buyer Profile ─────────────────────────────────────────────
+export const getBuyerProfile = async (req, res, next) => {
+  try {
+    const result = await query('SELECT * FROM buyer_profiles WHERE user_id=$1', [req.user.id]);
+    res.json({ success: true, data: result.rows[0] || null });
+  } catch (err) { next(err); }
+};
+
 export const createOrUpdateBuyerProfile = async (req, res, next) => {
   try {
     const { full_name, company_name, phone, gst_number, address, city, state } = req.body;
