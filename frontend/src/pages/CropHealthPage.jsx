@@ -42,10 +42,10 @@ export default function CropHealthPage() {
       fd.append('image', file);
       fd.append('language', language);
       if (cropId) fd.append('farmer_crop_id', cropId);
-      return healthApi.analyze(fd).then(r => r.data);
+      return healthApi.analyze(fd).then(r => r.data.data);
     },
     onSuccess: (data) => {
-      setAnalysis(data);
+      setAnalysis(data.analysis || data);
       qClient.invalidateQueries({ queryKey: ['healthReports'] });
     },
   });
@@ -102,7 +102,7 @@ export default function CropHealthPage() {
               </>
             )}
           </div>
-          <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => handleFileSelect(e.target.files[0])} />
+          <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => handleFileSelect(e.target.files[0])} />
 
           {preview && (
             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
@@ -151,6 +151,13 @@ export default function CropHealthPage() {
                 </div>
               </div>
             </div>
+
+            {analysis.message && !analysis.analysis_available && (
+              <div className="alert alert-warning" style={{ fontSize: '0.9rem', marginBottom: '1rem', background: 'var(--color-harvest-100)', color: 'var(--color-harvest-800)', display: 'flex', gap: '0.5rem', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+                <AlertTriangle size={16} />
+                <span>{analysis.message}</span>
+              </div>
+            )}
 
             {analysis.response && (
               <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1rem', fontSize: '0.9rem', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
