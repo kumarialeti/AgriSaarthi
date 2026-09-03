@@ -132,7 +132,7 @@ export const getLiveMarketPrices = async (req, res, next) => {
     }
 
     // Required fields per record
-    const REQUIRED = ['State', 'District', 'Market', 'Commodity', 'Arrival_Date', 'Modal_Price'];
+    const REQUIRED = ['state', 'district', 'market', 'commodity', 'arrival_date', 'modal_price'];
     const records = rawData.records.filter(r => REQUIRED.every(f => r[f] !== undefined && r[f] !== null));
 
     if (!records.length) {
@@ -144,15 +144,15 @@ export const getLiveMarketPrices = async (req, res, next) => {
     }
 
     const normalized = records.map(r => ({
-      state: r.State,
-      district: r.District,
-      market: r.Market,
-      commodity: r.Commodity,
-      variety: r.Variety || '',
-      arrival_date: r.Arrival_Date,
-      min_price_quintal: parseFloat(r.Min_Price) || null,
-      max_price_quintal: parseFloat(r.Max_Price) || null,
-      modal_price_quintal: parseFloat(r.Modal_Price) || null,
+      state: r.state,
+      district: r.district,
+      market: r.market,
+      commodity: r.commodity,
+      variety: r.variety || '',
+      arrival_date: r.arrival_date,
+      min_price_quintal: parseFloat(r.min_price) || null,
+      max_price_quintal: parseFloat(r.max_price) || null,
+      modal_price_quintal: parseFloat(r.modal_price) || null,
       source: 'agmarknet-data.gov.in',
     }));
 
