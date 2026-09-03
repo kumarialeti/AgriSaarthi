@@ -135,7 +135,19 @@ export default function BuyersPage() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '140px' }}>
                 {!isBuyer ? (
-                  <button className="btn btn-primary" style={{ width: '100%' }}>Contact Buyer</button>
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ width: '100%' }}
+                    onClick={() => {
+                      if (req.buyer_phone) {
+                        alert(`Contact ${req.buyer_name || req.company_name || 'Buyer'} at: ${req.buyer_phone}`);
+                      } else {
+                        alert('Phone number not provided by buyer.');
+                      }
+                    }}
+                  >
+                    Contact Buyer
+                  </button>
                 ) : (
                   <div className="badge" style={{ alignSelf: 'flex-start', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>
                     {req.status || 'OPEN'}

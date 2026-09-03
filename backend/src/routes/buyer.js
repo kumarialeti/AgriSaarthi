@@ -24,7 +24,7 @@ router.get('/open-requirements', async (req, res, next) => {
       `SELECT br.id, br.quantity_kg, br.desired_price_quintal, br.delivery_location,
               br.delivery_state, br.required_by, br.quality_specs, br.status,
               c.name_en as crop_name, c.name_te as crop_name_te,
-              bp.company_name, bp.city, bp.is_verified
+              bp.full_name as buyer_name, bp.phone as buyer_phone, bp.company_name, bp.city, bp.is_verified
        FROM buyer_requirements br
        JOIN crops c ON c.id = br.crop_id
        JOIN buyer_profiles bp ON bp.id = br.buyer_id
