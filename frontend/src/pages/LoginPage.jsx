@@ -16,7 +16,12 @@ export default function LoginPage() {
     e.preventDefault();
     const result = await login(form.email, form.password);
     if (result.success) {
-      navigate('/dashboard');
+      const loggedInUser = useAuthStore.getState().user;
+      if (loggedInUser?.role === 'ADMIN' || loggedInUser?.role === 'AGRICULTURE_OFFICER') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 

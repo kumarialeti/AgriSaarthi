@@ -191,7 +191,7 @@ async function seed() {
       const res = await client.query(
         `INSERT INTO users (email, password_hash, role, language, email_verified)
          VALUES ($1, $2, $3, $4, true)
-         ON CONFLICT (email) DO UPDATE SET updated_at = NOW()
+         ON CONFLICT (email) DO UPDATE SET role = EXCLUDED.role, password_hash = EXCLUDED.password_hash, updated_at = NOW()
          RETURNING id`,
         [u.email, hash, u.role, u.lang]
       );
