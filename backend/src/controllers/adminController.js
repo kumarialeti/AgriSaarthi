@@ -4,7 +4,7 @@ export const getAdminStats = async (req, res, next) => {
   try {
     const [
       usersRes, farmersRes, buyersRes, cropsRes, cropDistRes,
-      schemesRes, messagesRes, agentLogsRes
+      schemesRes, messagesRes, agentLogsRes, landAcresRes, diseaseAlertsRes
     ] = await Promise.all([
       query('SELECT COUNT(*) as total, role FROM users GROUP BY role'),
       query('SELECT COUNT(*) as total FROM farmer_profiles'),
@@ -18,6 +18,8 @@ export const getAdminStats = async (req, res, next) => {
       query(`SELECT agent_name, COUNT(*) as count, AVG(duration_ms) as avg_ms
              FROM agent_logs WHERE created_at > NOW() - INTERVAL '7 days'
              GROUP BY agent_name ORDER BY count DESC`),
+      query('SELECT SUM(total_land_acres) as total_acres FROM farmer_profiles'),
+      query("SELECT COUNT(*) as total FROM crop_health_reports WHERE severity IN ('High', 'Critical')")
     ]);
 
     const usersByRole = {};
@@ -37,6 +39,7 @@ export const getAdminStats = async (req, res, next) => {
           by_role: usersByRole,
           total: Object.values(usersByRole).reduce((a, b) => a + b, 0),
         },
+        total_users: Object.values(usersByRole).reduce((a, b) => a + b, 0),
         farmers: parseInt(farmersRes.rows[0].total),
         buyers: parseInt(buyersRes.rows[0].total),
         crops: {
@@ -44,9 +47,12 @@ export const getAdminStats = async (req, res, next) => {
           total: Object.values(cropsByStatus).reduce((a, b) => a + b, 0),
           distribution: cropDistRes.rows,
         },
+        total_crops: Object.values(cropsByStatus).reduce((a, b) => a + b, 0),
         schemes: parseInt(schemesRes.rows[0].total),
         chat_messages_30d: parseInt(messagesRes.rows[0].total),
         agent_activity_7d: agentLogsRes.rows,
+        total_land_acres: parseFloat(landAcresRes.rows[0]?.total_acres || 0),
+        disease_alerts: parseInt(diseaseAlertsRes.rows[0]?.total || 0),
       },
     });
   } catch (err) { next(err); }
@@ -80,7 +86,7 @@ export const getAllFarmers = async (req, res, next) => {
 export const getMarketTrends = async (req, res, next) => {
   try {
     const result = await query(
-      `SELECT c.name_en as crop, m.name as market, mp.modal_price_quintal, mp.price_date
+      `SELECT c.name_en as crop, m.district as region, mp.modal_price_quintal as avg_price, mp.price_date
        FROM market_prices mp JOIN crops c ON c.id=mp.crop_id JOIN markets m ON m.id=mp.market_id
        WHERE mp.price_date >= NOW() - INTERVAL '30 days'
        ORDER BY mp.price_date DESC, mp.modal_price_quintal DESC LIMIT 100`
