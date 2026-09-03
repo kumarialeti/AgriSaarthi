@@ -8,6 +8,7 @@ import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { exec } from 'child_process';
 
 import { logger } from './utils/logger.js';
 import { testConnection } from './db/pool.js';
@@ -126,6 +127,16 @@ app.get('/health', async (req, res) => {
   } catch {
     res.status(503).json({ status: 'unhealthy', service: 'agrisaarthi-backend', db: 'unavailable' });
   }
+});
+
+// Temporary endpoint to allow DB seeding on free tier hosting without shell access
+app.get('/api/run-seed', (req, res) => {
+  exec('npm run seed', (error, stdout, stderr) => {
+    if (error) {
+      return res.status(500).send(`<pre>Error: ${error.message}\n${stderr}</pre>`);
+    }
+    res.send(`<h1>Database Seeded Successfully!</h1><pre>${stdout}</pre><p>You can now close this tab and log in as an officer.</p>`);
+  });
 });
 
 // ─── API Routes ───────────────────────────────────────────────────
